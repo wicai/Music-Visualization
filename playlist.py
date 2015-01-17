@@ -48,8 +48,6 @@ def find_songs(acoustic, danceability, duration, energy, liveness, loudness, mod
         
         for s in songs:
             song_ids.append(str(s["id"]))
-            #song_data[str(s["id"])]["artist_id"] = str(s["artist_id"])
-        #print song_ids  
         return song_ids
     except urllib2.URLError as e:
         print(e.reason)
