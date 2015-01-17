@@ -1,8 +1,4 @@
-BeautifulSoup==3.2.1
-Cython==0.20.1
-Django==1.6.4
-Flask==0.10.1
-Jinja2==2.7.3
+
 MarkupSafe==0.23
 Pillow==2.5.1
 PyYAML==3.11
