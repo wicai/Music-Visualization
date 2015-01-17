@@ -197,7 +197,25 @@ def cluster():
 	print names
 	print artists
 
-	return render_template('cluster.html', x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists))
+	clusters = returned[1].tolist()
+	colors = []
+	options = {0 : "#000",
+					1 : "#FF0000",
+					2 : "#0000FF",
+					3 : "#008000",
+					4 : "#FFA500",
+					5 : "#800080",
+					6 : "#FFFF00",
+					7 : "#625D5D",
+					8 : "#00FFFF",
+					9 : "#FFE5B4",
+					10 : "#FC6C85",
+	}
+	for i in range(0, len(clusters)):
+		colors.append(options[clusters[i]])
+	print colors
+	
+	return render_template('cluster.html', colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists))
 
 if __name__ == '__main__':
 	app.run()
