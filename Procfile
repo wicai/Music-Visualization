@@ -1,0 +1,1 @@
+web: gunicorn music_cluster.wsgi
