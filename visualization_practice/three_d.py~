@@ -1,0 +1,43 @@
+from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import proj3d
+import matplotlib.pyplot as plt
+import pylab    
+
+xData1=[ 24500.,   2980.,   2980.,  13740.]
+xData2=[  8360.,   8360.,  24500.,   5670.,   2980.,   2980.,  11050.,  13740.]
+yData1=[ 179.,  244.,  242.,  181.]
+yData2=[ 132.,  149.,  116.,  163.,  247.,  228.,  116.,  116.]
+zData1=[  1.,  44.,  86.,  44.]
+zData2=[ 86.,  22.,   1.,  86.,  43.,  86.,  86.,  22.]
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+
+ax.plot(xData1, yData1, zData1, '^', c='r', label='cfg1')
+ax.plot(xData2, yData2, zData2, 'o', c='b', label='cfg2')
+
+
+for i in range(len(xData1)):
+    text='['+str(int(xData1[i]))+','+str(int(yData1[i]))+','+str(int(zData1[i]))+']'    
+    x2, y2, _ = proj3d.proj_transform(xData1[i],yData1[i],zData1[i], ax.get_proj())    
+    label = pylab.annotate(text,
+    xycoords='data', 
+    xy = (x2, y2), xytext = (60, 20),
+    textcoords = 'offset points', ha = 'right', va = 'bottom',
+    bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5),
+    arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+
+
+for i in range(len(xData2)):
+    text='['+str(int(xData2[i]))+','+str(int(yData2[i]))+','+str(int(zData2[i]))+']'    
+    x2, y2, _ = proj3d.proj_transform(xData2[i],yData2[i],zData2[i], ax.get_proj())    
+    label = pylab.annotate(text,
+    xycoords='data', 
+    xy = (x2, y2), xytext = (20, 20),
+    textcoords = 'offset points', ha = 'right', va = 'bottom',
+    bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5),
+    arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+
+ax.set_xlabel('X-Data')
+ax.set_ylabel('Y-Data')
+ax.set_zlabel('Z-Data')
