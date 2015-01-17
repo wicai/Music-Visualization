@@ -12,9 +12,9 @@ import numpy as np
 from sklearn.decomposition import PCA
 import sklearn.preprocessing as preprocessing
 
-# export SPOTIPY_CLIENT_ID='562a7296affa4b5dbe70437d11d837e3'
-# export SPOTIPY_CLIENT_SECRET='0153de287f2c45e0846c0390b67f991d'
-# export SPOTIPY_REDIRECT_URI='http://127.0.0.1:5000/login/authorized'
+SPOTIPY_CLIENT_ID='562a7296affa4b5dbe70437d11d837e3'
+SPOTIPY_CLIENT_SECRET='0153de287f2c45e0846c0390b67f991d'
+SPOTIPY_REDIRECT_URL = 'localhost:5000/authorize'
 
 scope = 'user-library-read'
 username = 'charmip'
@@ -88,7 +88,7 @@ def show_tracks(results):
         writer.writerow(feature_arr)
 
 
-token = util.prompt_for_user_token(username, scope)
+token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URL)
 if token:
     sp = spotipy.Spotify(auth=token)
     playlists = sp.user_playlists(username)
