@@ -8,6 +8,8 @@ from pylab import plot,show
 from numpy import vstack,array
 from numpy.random import rand
 from scipy.cluster.vq import kmeans,vq
+import numpy as np
+from sklearn.decomposition import PCA
 
 # export SPOTIPY_CLIENT_ID='562a7296affa4b5dbe70437d11d837e3'
 # export SPOTIPY_CLIENT_SECRET='0153de287f2c45e0846c0390b67f991d'
@@ -22,19 +24,21 @@ def cluster():
     reader = csv.reader(songid_file)
     features = []
     for row in reader:
-        print row
-        acousticness = row[3]
-        danceability = row[4]
-        duration = row[5]
-        energy = row[6]
-        liveness = row[7]
-        loudness = row[8]
-        mode = row[9]
-        speechiness = row[10]
-        tempo = row[11]
+        acousticness = float(row[3])
+        danceability = float(row[4])
+        duration = float(row[5])
+        energy = float(row[6])
+        liveness = float(row[7])
+        loudness = float(row[8])
+        mode = float(row[9])
+        speechiness = float(row[10])
+        tempo = float(row[11])
         feature_arr = [acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
-        print feature_arr
-        features.add(feature_arr)
+        features.append(feature_arr)
+    print features
+    pca = PCA(n_components=3)
+    pca.fit(features)
+    print(pca.explained_variance_ratio_)
 
 def show_tracks(results):
     songid_file = open("/Users/danielchen/Documents/Music-Visualization/static/songids.csv", 'w')
@@ -78,7 +82,6 @@ def show_tracks(results):
         tempo = json_response2["response"]["songs"][0]["audio_summary"]["tempo"]
         feature_arr = [song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
         
-        print feature_arr
         writer.writerow(feature_arr)
 
 
