@@ -146,7 +146,28 @@ def cluster():
 	pcaed = pca.fit_transform(trained)
 	print pcaed
 
-	n_clusters = 3
+	costs = []
+	ratios = []
+	ratio_differences = []
+	for i in range(3, 11):
+		kmeans_data = k_means(pcaed, n_clusters=i)
+		cost = kmeans_data[2]
+		costs.append(cost)
+		if i > 3:
+			ratios.append(costs[i - 3] / costs[i - 4])
+		if i > 4:
+			ratio_differences.append(abs(ratios[i - 4] - ratios[i - 5]))
+	
+	n_clusters = 0
+	max_diff = 0
+	for i in range(0, len(ratio_differences)):
+		if ratio_differences[i] > max_diff:
+			max_diff = ratio_differences[i]
+			n_clusters = i
+
+	n_clusters += 4
+	print n_clusters
+
 	returned = k_means(pcaed, n_clusters=n_clusters) 
 	print returned
 
@@ -176,7 +197,25 @@ def cluster():
 	print names
 	print artists
 
-	return render_template('cluster.html', x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists))
+	clusters = returned[1].tolist()
+	colors = []
+	options = {0 : "#000",
+					1 : "#FF0000",
+					2 : "#0000FF",
+					3 : "#008000",
+					4 : "#FFA500",
+					5 : "#800080",
+					6 : "#FFFF00",
+					7 : "#625D5D",
+					8 : "#00FFFF",
+					9 : "#FFE5B4",
+					10 : "#FC6C85",
+	}
+	for i in range(0, len(clusters)):
+		colors.append(options[clusters[i]])
+	print colors
+	
+	return render_template('cluster.html', colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists))
 
 if __name__ == '__main__':
 	app.run()
