@@ -146,7 +146,28 @@ def cluster():
 	pcaed = pca.fit_transform(trained)
 	print pcaed
 
-	n_clusters = 3
+	costs = []
+	ratios = []
+	ratio_differences = []
+	for i in range(3, 11):
+		kmeans_data = k_means(pcaed, n_clusters=i)
+		cost = kmeans_data[2]
+		costs.append(cost)
+		if i > 3:
+			ratios.append(costs[i - 3] / costs[i - 4])
+		if i > 4:
+			ratio_differences.append(abs(ratios[i - 4] - ratios[i - 5]))
+	
+	n_clusters = 0
+	max_diff = 0
+	for i in range(0, len(ratio_differences)):
+		if ratio_differences[i] > max_diff:
+			max_diff = ratio_differences[i]
+			n_clusters = i
+
+	n_clusters += 4
+	print n_clusters
+
 	returned = k_means(pcaed, n_clusters=n_clusters) 
 	print returned
 
