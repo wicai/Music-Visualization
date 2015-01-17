@@ -10,6 +10,7 @@ from numpy.random import rand
 from scipy.cluster.vq import kmeans,vq
 import numpy as np
 from sklearn.decomposition import PCA
+import sklearn.preprocessing as preprocessing
 
 # export SPOTIPY_CLIENT_ID='562a7296affa4b5dbe70437d11d837e3'
 # export SPOTIPY_CLIENT_SECRET='0153de287f2c45e0846c0390b67f991d'
@@ -35,10 +36,12 @@ def cluster():
         tempo = float(row[11])
         feature_arr = [acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
         features.append(feature_arr)
-    print features
+    min_max_scaler = preprocessing.MinMaxScaler(feature_range=(-1,1))
+    trained=min_max_scaler.fit_transform(features)
     pca = PCA(n_components=3)
-    pca.fit(features)
+    trained = pca.fit_transform(trained)
     print(pca.explained_variance_ratio_)
+    print trained
 
 def show_tracks(results):
     songid_file = open("/Users/danielchen/Documents/Music-Visualization/static/songids.csv", 'w')
@@ -85,22 +88,22 @@ def show_tracks(results):
         writer.writerow(feature_arr)
 
 
-# token = util.prompt_for_user_token(username, scope)
-# if token:
-#     sp = spotipy.Spotify(auth=token)
-#     playlists = sp.user_playlists(username)
-#     for playlist in playlists['items']:
-#             if playlist['owner']['id'] == username:
-#                 print playlist['name']
-#                 print '  total tracks', playlist['tracks']['total']
-#                 results = sp.user_playlist(username, playlist['id'],
-#                     fields="tracks,next")
-#                 tracks = results['tracks']
-#                 show_tracks(tracks)
-#                 while tracks['next']:
-#                     tracks = sp.next(tracks)
-#                     show_tracks(tracks)
-#                 break
-# else:
-#     print "Can't get token for", username
+token = util.prompt_for_user_token(username, scope)
+if token:
+    sp = spotipy.Spotify(auth=token)
+    playlists = sp.user_playlists(username)
+    for playlist in playlists['items']:
+            if playlist['owner']['id'] == username:
+                print playlist['name']
+                print '  total tracks', playlist['tracks']['total']
+                results = sp.user_playlist(username, playlist['id'],
+                    fields="tracks,next")
+                tracks = results['tracks']
+                show_tracks(tracks)
+                while tracks['next']:
+                    tracks = sp.next(tracks)
+                    show_tracks(tracks)
+                break
+else:
+    print "Can't get token for", username
 cluster()
