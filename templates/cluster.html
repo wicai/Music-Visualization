@@ -16,12 +16,14 @@ var a2 = {{x2|safe}};
 var a3 = {{x3|safe}};
 var names = {{names|safe}};
 artists = {{artists|safe}};
+
 /*
 a1 = [.1,.2,.3,.4,.5,.6]
 a2 = [.1,.2,.3,.4,.5,.6]
 a3 = [.1,.2,.3,.4,.5,.6]
 var names = ['a','b','c','d','e','f']
 */
+
 var series=[];
 len = a2.length,
 i = 0;
@@ -30,7 +32,11 @@ for (i;i<len;i++){
 	   series.push({
 	   name: names[i],
 	   colorByPoint:false,
-	   data: [[a1[i],a2[i],a3[i]]]
+	   data: [{
+	   x:a1[i],
+	   y:a2[i],
+	   z:a3[i],
+	   artist:artists[i]}]
 	   });
 }
 
@@ -71,6 +77,12 @@ console.log(series)
                 }
             }
         },
+	   tooltip: {
+                formatter: function() {
+                    return  '<b>' + this.series.name +'</b><br/>' +
+	   '<b>' + this.point.artist + '</b><br/>' 
+                }
+            },
         title: {
             text: 'Draggable box'
         },
@@ -81,7 +93,7 @@ console.log(series)
             scatter: {
                 width: 10,
                 height: 10,
-                depth: 10
+                depth: 10,
             }
         },
         yAxis: {
