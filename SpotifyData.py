@@ -17,7 +17,24 @@ scope = 'user-library-read'
 username = 'charmip'
 api_key = 'PV1DZKHWQ6OZX6LEO'
 
-
+def cluster():
+    songid_file = open("/Users/danielchen/Documents/Music-Visualization/static/songids.csv", "rU")
+    reader = csv.reader(songid_file)
+    features = []
+    for row in reader:
+        print row
+        acousticness = row[3]
+        danceability = row[4]
+        duration = row[5]
+        energy = row[6]
+        liveness = row[7]
+        loudness = row[8]
+        mode = row[9]
+        speechiness = row[10]
+        tempo = row[11]
+        feature_arr = [acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
+        print feature_arr
+        features.add(feature_arr)
 
 def show_tracks(results):
     songid_file = open("/Users/danielchen/Documents/Music-Visualization/static/songids.csv", 'w')
@@ -29,7 +46,7 @@ def show_tracks(results):
         url = "http://developer.echonest.com/api/v4/song/search"
         data = {}
         data['api_key'] = api_key
-        artist = ("%32.32s" % (track['artists'][0]['name'])).encode("utf8")
+        artist = (("%32.32s" % (track['artists'][0]['name'])).encode("utf8")).strip()
         data['artist'] = artist
         name = track['name']
         data['title'] = name
@@ -65,21 +82,22 @@ def show_tracks(results):
         writer.writerow(feature_arr)
 
 
-token = util.prompt_for_user_token(username, scope)
-if token:
-    sp = spotipy.Spotify(auth=token)
-    playlists = sp.user_playlists(username)
-    for playlist in playlists['items']:
-            if playlist['owner']['id'] == username:
-                print playlist['name']
-                print '  total tracks', playlist['tracks']['total']
-                results = sp.user_playlist(username, playlist['id'],
-                    fields="tracks,next")
-                tracks = results['tracks']
-                show_tracks(tracks)
-                while tracks['next']:
-                    tracks = sp.next(tracks)
-                    show_tracks(tracks)
-                break
-else:
-    print "Can't get token for", username
+# token = util.prompt_for_user_token(username, scope)
+# if token:
+#     sp = spotipy.Spotify(auth=token)
+#     playlists = sp.user_playlists(username)
+#     for playlist in playlists['items']:
+#             if playlist['owner']['id'] == username:
+#                 print playlist['name']
+#                 print '  total tracks', playlist['tracks']['total']
+#                 results = sp.user_playlist(username, playlist['id'],
+#                     fields="tracks,next")
+#                 tracks = results['tracks']
+#                 show_tracks(tracks)
+#                 while tracks['next']:
+#                     tracks = sp.next(tracks)
+#                     show_tracks(tracks)
+#                 break
+# else:
+#     print "Can't get token for", username
+cluster()
