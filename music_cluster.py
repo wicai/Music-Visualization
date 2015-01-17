@@ -214,8 +214,12 @@ def cluster():
 	for i in range(0, len(clusters)):
 		colors.append(options[clusters[i]])
 	print colors
-	
-	return render_template('cluster.html', colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists))
+	xmax = []
+	xmax.append(max(x1))
+	xmax.append(max(x2))
+	xmax.append(max(x3))
+
+	return render_template('cluster.html', colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists), xmax=json.dumps(xmax))
 
 if __name__ == '__main__':
 	app.run()

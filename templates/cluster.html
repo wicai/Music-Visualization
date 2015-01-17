@@ -16,7 +16,8 @@ var a2 = {{x2|safe}};
 var a3 = {{x3|safe}};
 var names = {{names|safe}};
 artists = {{artists|safe}};
-
+colors = {{colors|safe}};
+var xmax = {{xmax|safe}};
 /*
 a1 = [.1,.2,.3,.4,.5,.6]
 a2 = [.1,.2,.3,.4,.5,.6]
@@ -31,7 +32,7 @@ i = 0;
 for (i;i<len;i++){
 	   series.push({
 	   name: names[i],
-	   colorByPoint:false,
+	   color: colors[i],
 	   data: [{
 	   x:a1[i],
 	   y:a2[i],
@@ -84,10 +85,10 @@ console.log(series)
                 }
             },
         title: {
-            text: 'Draggable box'
+            text: 'Your music'
         },
         subtitle: {
-            text: 'Click and drag the plot area to rotate in space'
+            text: 'from a new perspective'
         },
         plotOptions: {
             scatter: {
@@ -98,17 +99,17 @@ console.log(series)
         },
         yAxis: {
             min: 0,
-            max: 10,
+            max: xmax[1],
             title: null
         },
         xAxis: {
             min: 0,
-            max: 10,
+            max: xmax[0],
             gridLineWidth: .1
         },
         zAxis: {
             min: 0,
-            max: 10
+            max: xmax[2]
         },
         legend: {
             enabled: false
