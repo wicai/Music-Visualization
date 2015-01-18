@@ -216,6 +216,12 @@ def cluster():
 	returned = k_means(pcaed, n_clusters=n_clusters) 
 	print returned
 
+	centroids = returned[0]
+        #write centroids                                                                                                     
+        with open('static/centroids.csv', 'wb') as csvfile:
+                center_writer = csv.writer(csvfile)
+                for i in range (0, len(centroids)):
+                        center_writer.writerow([str(i), centroids[i][0], centroids[i][1], centroids[i][2]])
 	x1 = []
 	x2 = []
 	x3 = []
