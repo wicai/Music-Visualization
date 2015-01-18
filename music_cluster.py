@@ -45,7 +45,7 @@ spotify_auth_code = "BQDY3Ccu7vobaCfAKh7lUPwNN-W8xtHDV_ajyjenARigS6d64k274dzQbe8
 
 scope = 'user-library-read'
 api_key = 'PV1DZKHWQ6OZX6LEO'
-api_key2 = '4BHBA6BB9J7GOEAJU'
+vapi_key2 = '4BHBA6BB9J7GOEAJU'
 api_key3 = '4L4M7QV9W0QSNZ2UD'
 
 def connect_db():
@@ -58,7 +58,7 @@ def init_db():
 		db.commit()
 
 def show_tracks(tracks):
-    songid_file = open("static/songidsbad.csv", 'w')
+    songid_file = open("static/songidsbad.csv", 'a')
     #songid_file = open("static/songids.csv", 'w')
     writer = csv.writer(songid_file)
     # fields = "song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo"
@@ -81,51 +81,61 @@ def show_tracks(tracks):
         print full_url
         print
       	if artist and name:
-	        ids = urllib2.urlopen(full_url).read()
-	        json_response = json.loads(ids)
-	        if len(json_response["response"]["songs"]) > 0:
-	        	song_id = json_response["response"]["songs"][0]["id"]
-		        url2 = "http://developer.echonest.com/api/v4/song/profile"
-		        data2 = {}
-		        data2['api_key'] = api_key
-		        data2['id'] = song_id
-		        data2['bucket'] = 'audio_summary'
-		        url_values2 = urllib.urlencode(data2)
-		        full_url2 = url2 + '?' + url_values2
-		        features = urllib2.urlopen(full_url2).read()
-		        json_response2 = json.loads(features)
-		        acousticness = float(json_response2["response"]["songs"][0]["audio_summary"]["acousticness"])
-		        danceability = float(json_response2["response"]["songs"][0]["audio_summary"]["danceability"])
-		        duration = int(json_response2["response"]["songs"][0]["audio_summary"]["duration"])
-		        energy = float(json_response2["response"]["songs"][0]["audio_summary"]["energy"])
-		        liveness = float(json_response2["response"]["songs"][0]["audio_summary"]["liveness"])
-		        loudness = float(json_response2["response"]["songs"][0]["audio_summary"]["loudness"])
-		        mode = int(json_response2["response"]["songs"][0]["audio_summary"]["mode"])
-		        speechiness = float(json_response2["response"]["songs"][0]["audio_summary"]["speechiness"])
-		        tempo = int(json_response2["response"]["songs"][0]["audio_summary"]["tempo"])
-		        feature_arr = [song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
-		        print feature_arr
-		        writer.writerow(feature_arr)
+		try:
+			ids = urllib2.urlopen(full_url).read()
+			json_response = json.loads(ids)
+			if len(json_response["response"]["songs"]) > 0:
+				song_id = json_response["response"]["songs"][0]["id"]
+				url2 = "http://developer.echonest.com/api/v4/song/profile"
+				data2 = {}
+				data2['api_key'] = api_key
+				data2['id'] = song_id
+				data2['bucket'] = 'audio_summary'
+				url_values2 = urllib.urlencode(data2)
+				full_url2 = url2 + '?' + url_values2
+				features = urllib2.urlopen(full_url2).read()
+				json_response2 = json.loads(features)
+				acousticness = float(json_response2["response"]["songs"][0]["audio_summary"]["acousticness"])
+				danceability = float(json_response2["response"]["songs"][0]["audio_summary"]["danceability"])
+				duration = int(json_response2["response"]["songs"][0]["audio_summary"]["duration"])
+				energy = float(json_response2["response"]["songs"][0]["audio_summary"]["energy"])
+				liveness = float(json_response2["response"]["songs"][0]["audio_summary"]["liveness"])
+				loudness = float(json_response2["response"]["songs"][0]["audio_summary"]["loudness"])
+				mode = int(json_response2["response"]["songs"][0]["audio_summary"]["mode"])
+				speechiness = float(json_response2["response"]["songs"][0]["audio_summary"]["speechiness"])
+				tempo = int(json_response2["response"]["songs"][0]["audio_summary"]["tempo"])
+				feature_arr = [song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
+				print feature_arr
+				writer.writerow(feature_arr)
+		except urllib2.HTTPError, err:
+			if err.code == 429:
+				return -1
+			else:
+				raise
 
 def spotify_info(username, token):
 	#token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URL)
 	if token:
+            songid_file = open("static/songidsbad.csv", 'w')
+	    songid_file.close()
 	    sp = spotipy.Spotify(auth=token)
 	    playlists = sp.user_playlists(username)
-        for playlist in playlists['items']:
+	for playlist in playlists['items']:
             print playlist['owner']['id']
-            if playlist['owner']['id'] == username:
-                print playlist['name']
-                print '  total tracks', playlist['tracks']['total']
-                results = sp.user_playlist(username, playlist['id'],
+	    if playlist['owner']['id'] == username:
+		    print playlist['name']
+		    print '  total tracks', playlist['tracks']['total']
+		    results = sp.user_playlist(username, playlist['id'],
                     fields="tracks,next")
-                tracks = results['tracks']
-                show_tracks(tracks)
-                while tracks['next']:
-                    tracks = sp.next(tracks)
-                    show_tracks(tracks)
-	else:
-	    print "Can't get token for", username
+		    tracks = results['tracks']
+		    returned = show_tracks(tracks)
+		    if (returned == -1):
+			    print "yahoo"
+			    return 0
+		    while tracks['next']:
+			    tracks = sp.next(tracks)
+			    show_tracks(tracks)
+	return 0
 
 @app.route('/')
 def index():
@@ -308,7 +318,7 @@ def playlist():
 
 	options = {"black" : 0,
 					"red" : 1,
-					"blue" : 2,
+					"glue" : 2,
 					"green" : 3,
 					"orange" : 4,
 					"purple" : 5,
@@ -337,7 +347,7 @@ def playlist():
 
 	create_url = "https://api.spotify.com/v1/users/" + username + "/playlists"
 	print username
-	playlist_name = "Playlist " + str(number)
+	playlist_name = str(color) + " playlist"
 	values = {'name' : playlist_name}
 	auth = "Bearer " + token
 	headers = {'Content-Type': 'application/json', 'Authorization' : auth}
