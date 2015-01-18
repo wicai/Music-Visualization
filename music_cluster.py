@@ -12,6 +12,7 @@ import urllib, urllib2
 import json
 from pylab import plot,show
 from numpy import vstack,array
+from numpy import sum
 from numpy.random import rand
 from scipy.cluster.vq import kmeans,vq
 import numpy as np
@@ -216,7 +217,31 @@ def cluster():
 	returned = k_means(pcaed, n_clusters=n_clusters) 
 	print returned
 
+
+
 	centroids = returned[0]
+
+
+        #write centroids, but with original features
+        centroid_features = []
+        for i in range(0, max(returned[1]) + 1): #for each cluster
+                tot = [0] * 9
+                num_el = 0
+                for ii in range(0, len(returned[1])): #for each song
+                        if (returned[1][ii] == i): # if it's this cluster
+                                tot = sum([features[ii], tot], axis=0)
+                                num_el+=1.
+                print(tot)
+                tot *= 1/(num_el)
+                centroid_features.append(tot)
+
+        print("centroid features[0] is")
+        print(centroid_features[0])
+        with open('static/features.csv', 'wb') as csvfile:
+                feature_writer = csv.writer(csvfile)
+                for i in range(0, len(centroid_features)):
+                        feature_writer.writerow([centroid_features[i][0],centroid_features[i][1],centroid_features[i][2],centroid_features[i][3],centroid_features[i][4],centroid_features[i][5],centroid_features[i][6],centroid_features[i][7],centroid_features[i][8]])
+        
         #write centroids                                                                                                     
         with open('static/centroids.csv', 'wb') as csvfile:
                 center_writer = csv.writer(csvfile)
