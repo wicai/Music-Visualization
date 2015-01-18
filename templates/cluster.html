@@ -157,6 +157,41 @@ console.log(series)
     });
 });
 </script>
+<script>
+$(function() { // wrap inside the jquery ready() function
+
+//Attach an onclick handler to each of your buttons that are meant to "approve"
+$('button.playlist_button').click(function(){
+
+   //Get the ID of the button that was clicked on
+  var button_id = $(this).attr("id");
+  var username = "{{ username }}"
+  var a1 = {{x1|safe}};
+  var a2 = {{x2|safe}};
+  var a3 = {{x3|safe}};
+  var names = {{names|safe}};
+  var artists = {{artists|safe}};
+  var colors = {{colors|safe}};
+  var xmax = {{xmax|safe}};
+  var num_colors = {{num_colors|safe}}
+   $.ajax({
+      url: "/playlists",
+      type: "POST",
+      data: {"id" : button_id, "username" : username, "token" : "{{ token }}",
+              "x1" : a1, "x2" : a2, "x3" : a3, "names" : names, "artists" : artists, 
+              "colors" : colors, "xmax" : xmax, "num_colors" : num_colors},
+      success: function(){
+          console.log("AJAX request was successfull");
+      },
+      error:function(){
+          console.log("AJAX request was a failure");
+      }   
+    });
+
+});
+
+});
+</script>
 </head>
 
 <body>
@@ -170,7 +205,7 @@ console.log(series)
     <td>
       <div>
       {% if num_colors!='0' %}
-      <a href="/"> <div style="background-color:black;color:white"> Put Black Playlist In Spotify </div> </a>
+      <button type="button" id="black" class="playlist_button">Put Black Playlist in Spotify</button>
       
       {% if num_colors!='1' %}
       <a href="/"> <div style="background-color:red;color:white";> Put Red Playlist In Spotify </div> </a>
@@ -204,6 +239,8 @@ console.log(series)
 
   </tr>
 </table>
+
+
 
     
 

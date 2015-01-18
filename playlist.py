@@ -1,6 +1,7 @@
 import urllib
 import urllib2
 import json
+import requests
 
 echonest_playlists_api = 'http://developer.echonest.com/api/v4/playlist/static?'
 echonest_songs_api = 'http://developer.echonest.com/api/v4/song/search?'
@@ -131,3 +132,22 @@ songs = find_songs(0.9101, 0.1515, 401.30667, 0.2253, 0.07785, -15.4083, 1, 0.03
 print songs
 taste_profile_id = create_taste_profile(songs)
 uris_json = create_playlist(taste_profile_id)
+print uris_json["uris"]
+
+username = 'dchen7'
+create_playlist = "https://api.spotify.com/v1/users/" + username + "/playlists"
+values = {'name' : 'Playlist'}
+token = "BQDhZoPcw652OjGioO9kOm3-GrUrw5xpGk_YdUVqf-lHoApRUYwTbkxLv6O1ONsM9Xtg-BL0lxTAjcZ-FmrnfqLsRwcH3SgMt_a4NRHfsRMKuHsnt7VW9CVprzhZjamFMbHkFmES-4nbTVKKo_XDM1KKUSJBazgAD64h02sT0iV99cQgoVbpU0gw50y3VGFYnw7_YwVH8gyXKDIwHTQl8IMBxM6UJ5WtrBmodhOTXnvcHA"
+auth = "Bearer " + token
+print auth
+headers = {'Content-Type': 'application/json', 'Authorization' : auth}
+r = requests.post(create_playlist, data=json.dumps(values), headers=headers)
+print r.text
+json_response = json.loads(r.text)
+playlist_id = json_response["id"]
+
+add_playlist = "https://api.spotify.com/v1/users/" + username + "/playlists/" + playlist_id + "/tracks"
+values = {'uris' : ['spotify:track:4iV5W9uYEdYUVa79Axb7Rh']}
+r = requests.post(add_playlist, data=json.dumps(values), headers=headers)
+print r.text
+

@@ -19,6 +19,7 @@ import sklearn.preprocessing as preprocessing
 from sklearn.cluster import k_means as k_means
 import spotipy
 import spotipy.util as util
+import requests
 
 DATABASE = '/tmp/features.db'
 DEBUG = True
@@ -31,6 +32,14 @@ app.secret_key = 'why would I tell you my secret key?'
 SPOTIPY_CLIENT_ID='562a7296affa4b5dbe70437d11d837e3'
 SPOTIPY_CLIENT_SECRET='0153de287f2c45e0846c0390b67f991d'
 SPOTIPY_REDIRECT_URL = 'http://localhost:5000/authorize/'
+echonest_playlists_api = 'http://developer.echonest.com/api/v4/playlist/static?'
+echonest_songs_api = 'http://developer.echonest.com/api/v4/song/search?'
+echonest_taste_profile_create_api = 'http://developer.echonest.com/api/v4/tasteprofile/create'
+echonest_taste_profile_update_api = 'http://developer.echonest.com/api/v4/tasteprofile/update'
+
+# api_key = "4L4M7QV9W0QSNZ2UD"
+spotify_auth_code = "BQDY3Ccu7vobaCfAKh7lUPwNN-W8xtHDV_ajyjenARigS6d64k274dzQbe8noLNl5Sku6_zHQdtN2waRCgybcqdrq2FqUzSt3X95KGZa_7MPaJppeDHKVkFuGwWPAFGCFX2vVoHfplFAIrtudHnwqZF1TgQB_E3ZBM6LwhfCJr8OlTnKdslJKMU"
+
 
 scope = 'user-library-read'
 api_key = 'PV1DZKHWQ6OZX6LEO'
@@ -134,7 +143,7 @@ def submit():
 		token = request.form['token']
 		spotify_info(username, token)
 		# print response.read()
-		return redirect(url_for('cluster'))
+		return redirect(url_for('cluster', username=username, token=token))
 
 
 # @app.route('/authorize')
@@ -157,8 +166,190 @@ def submit():
 # 	print access_token
 # 	return redirect(url_for('cluster'))
 
+
+def find_songs(acoustic, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo):  
+    values = {
+        'api_key': api_key3,
+        'min_acousticness': acoustic - 0.05 if acoustic - 0.05 > 0 else 0.001,
+        'max_acousticness': acoustic + 0.05 if acoustic + 0.05 < 1 else 0.999,
+        'min_danceability': danceability - 0.05 if danceability - 0.05 > 0 else 0.001,
+        'max_danceability': danceability + 0.05 if danceability + 0.05 < 1 else 0.999,
+        'min_duration': duration - 30 if duration - 30 > 0 else 0.001,
+        'max_duration': duration + 30 if duration + 30 < 3600 else 3599.999,
+        'min_energy': energy - 0.05 if energy - 0.05 > 0 else 0.001, 
+        'max_energy': energy + 0.05 if energy + 0.05 < 1 else 0.999,
+        'min_liveness': liveness - 0.05 if liveness - 0.05 > 0 else 0.001,
+        'max_liveness': liveness + 0.05 if liveness + 0.05 < 1 else 0.999,
+        'min_loudness': loudness - 5.5 if loudness - 5.5 > -100 else -99.999,
+        'max_loudness': loudness + 5.5 if loudness + 5.5 < 100 else 99.999,
+        'mode': mode,
+        'min_speechiness': speechiness - 0.05 if speechiness - 0.05 > 0 else 0.001,
+        'max_speechiness': speechiness + 0.05 if speechiness + 0.05 < 1 else 0.999,
+        'min_tempo': tempo - 10.5 if tempo - 10.5 > 0 else 0.001,
+        'max_tempo': tempo + 10.5 if tempo + 10.5 < 500 else 499.999,
+        'sort': 'song_hotttnesss-desc',
+        'results': 25
+    }
+    data = urllib.urlencode(values)
+    url = echonest_songs_api + data
+
+    try: 
+        response = urllib2.urlopen(url)
+        song_ids = []
+        songs = json.loads(response.read())["response"]["songs"]
+        
+        for s in songs:
+            song_ids.append(str(s["id"]))
+        return song_ids
+    except urllib2.URLError as e:
+        print(e.reason)
+
+def create_taste_profile(songs):
+    values = {
+        'api_key': api_key3,
+        'type': 'song',
+        'name': 'song_catalog',
+        'format': 'json'
+    }
+     
+    data = urllib.urlencode(values)
+    req = urllib2.Request(echonest_taste_profile_create_api, data)
+    
+    try: 
+        response = urllib2.urlopen(req)  
+        response_data = response.read()   
+        success = str(json.loads(response_data)["response"]["status"]["message"])
+        if(success == 'Success'):
+            catalog_id = str(json.loads(response_data)["response"]["id"])
+        else:
+            catalog_id = str(json.loads(response_data)["response"]["status"]["id"])
+        
+        taste_profile = []
+        
+        for i in songs:
+            taste_profile.append({'item': {'song_id': i}})
+        json_taste_profile = json.dumps(taste_profile)
+
+        update_values = {
+            'api_key': api_key3,
+            'id': catalog_id,
+            'data': json_taste_profile,
+            'data_type': 'json',
+            'format': 'json'
+        }
+        
+        update_data = urllib.urlencode(update_values)
+        update_req = urllib2.Request(echonest_taste_profile_update_api, update_data)
+        try:
+            update_response = urllib2.urlopen(update_req)
+        except urllib2.URLError as update_e:
+            print(update_e.reason)
+
+        return catalog_id
+        
+    except urllib2.URLError as e:
+        print(e.reason)
+   
+def create_playlist(taste_profile_id):
+    values = {
+        'api_key': api_key3,
+        'results': 20,
+        'type': 'catalog',
+        'seed_catalog': taste_profile_id
+    }
+
+    data = urllib.urlencode(values)
+    req = echonest_playlists_api + data + '&bucket=tracks&bucket=id:spotify&limit=true'
+    try:
+        response = urllib2.urlopen(req)
+        playlist_data = json.loads(response.read())
+        songs = playlist_data["response"]["songs"]
+       
+        uris = []
+        for s in songs:
+            track_id = s["tracks"][0]["foreign_id"]
+            uris.append(str(track_id))
+        
+        uris_json = {"uris": uris}
+        return uris_json
+
+    except urllib2.URLError as e:
+        print(e.reason)
+
+
+def read_cluster_features(file):
+	read_file = open(file)
+	features = []
+
+	try: 
+		reader = csv.reader(read_file)
+		for row in reader:
+			features.append(row)
+	finally:
+		read_file.close()
+
+	return features
+
+def get_features(cluster):
+	all_features = read_cluster_features('static/features.csv')
+	features = all_features[cluster]
+	songs = find_songs(float(features[0]), float(features[1]), float(features[2]), 
+						float(features[3]), float(features[4]), float(features[5]), 
+						float(features[6]), float(features[7]), float(features[8]))
+	return songs
+
+@app.route('/playlists', methods=['POST'])
+def playlist():
+
+	options = {"black" : 0,
+					"red" : 1,
+					"blue" : 2,
+					"green" : 3,
+					"orange" : 4,
+					"purple" : 5,
+					"grey" : 6
+	}
+
+	color = request.form["id"]
+	number = options[color]
+	songs = get_features(number)
+
+	taste_profile_id = create_taste_profile(songs)
+	uris_json = create_playlist(taste_profile_id)
+	uris = uris_json["uris"]
+	username = request.form["username"]
+	token = request.form["token"]
+	
+
+	# colors = request.form["colors"]
+	# x1 = request.form["x1"]
+	# x2 = request.form["x2"]
+	# x3 = request.form["x3"]
+	# names = request.form["names"]
+	# artists = request.form["artists"]
+	# xmax = request.form["xmax"]
+	# num_colors = request.form["num_colors"]
+
+	create_url = "https://api.spotify.com/v1/users/" + username + "/playlists"
+	playlist_name = "Playlist " + number
+	values = {'name' : playlist_name}
+	auth = "Bearer " + token
+	headers = {'Content-Type': 'application/json', 'Authorization' : auth}
+	r = requests.post(create_url, data=json.dumps(values), headers=headers)
+	json_response = json.loads(r.text)
+	playlist_id = json_response["id"]
+
+	add_playlist = "https://api.spotify.com/v1/users/" + username + "/playlists/" + playlist_id + "/tracks"
+	values = {'uris' : uris}
+	r = requests.post(add_playlist, data=json.dumps(values), headers=headers)
+	return render_template('cluster.html', playlist_id=playlist_id, username=username, token=token)
+	#, colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists), xmax=json.dumps(xmax), num_colors=json.dumps(num_colors))
+
+
 @app.route('/cluster')
 def cluster():
+	username = request.args['username']
+	token = request.args['token']
 	songid_file = open("static/songids.csv", "rU")
 	reader = csv.reader(songid_file)
 	features = []
@@ -256,9 +447,6 @@ def cluster():
 					4 : "#FFA500", #orange
 					5 : "#800080", #purple
 					6 : "#625D5D", #grey
-					7 : "#00FFFF", #blue
-					8 : "#FFE5B4", #light orange
-					9 : "#FC6C85",#pink
 	}
 	for i in range(0, len(clusters)):
 		colors.append(options[clusters[i]])
@@ -270,7 +458,7 @@ def cluster():
 	
 	num_colors=max(clusters) + 1
 
-	return render_template('cluster.html', colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists), xmax=json.dumps(xmax), num_colors=json.dumps(num_colors))
+	return render_template('cluster.html', username=username, token=token, colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists), xmax=json.dumps(xmax), num_colors=json.dumps(num_colors))
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')
