@@ -21,6 +21,7 @@ from sklearn.cluster import k_means as k_means
 import spotipy
 import spotipy.util as util
 import requests
+import unicodedata
 
 DATABASE = '/tmp/features.db'
 DEBUG = True
@@ -57,8 +58,9 @@ def init_db():
 		db.commit()
 
 def show_tracks(tracks):
-    # songid_file = open("static/songids.csv", 'w')
-    # writer = csv.writer(songid_file)
+    songid_file = open("static/songidsbad.csv", 'w')
+    #songid_file = open("static/songids.csv", 'w')
+    writer = csv.writer(songid_file)
     # fields = "song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo"
     # db = connect_db()
     # cur = db.cursor()
@@ -66,43 +68,44 @@ def show_tracks(tracks):
         track = item['track']
         print "   %d %32.32s %s" % (i, track['artists'][0]['name'],
             track['name'])
-       #  url = "http://developer.echonest.com/api/v4/song/search"
-       #  data = {}
-       #  data['api_key'] = api_key
-       #  artist = (("%32.32s" % (track['artists'][0]['name'])).encode("utf8")).strip()
-       #  data['artist'] = artist
-       #  name = track['name']
-       #  data['title'] = name
-       #  url_values = urllib.urlencode(data)
-       #  full_url = url + '?' + url_values
-       #  print full_url
-       #  print
-      	# if artist and name:
-	      #   ids = urllib2.urlopen(full_url).read()
-	      #   json_response = json.loads(ids)
-	      #   if len(json_response["response"]["songs"]) > 0:
-	      #   	song_id = json_response["response"]["songs"][0]["id"]
-		     #    url2 = "http://developer.echonest.com/api/v4/song/profile"
-		     #    data2 = {}
-		     #    data2['api_key'] = api_key
-		     #    data2['id'] = song_id
-		     #    data2['bucket'] = 'audio_summary'
-		     #    url_values2 = urllib.urlencode(data2)
-		     #    full_url2 = url2 + '?' + url_values2
-		     #    features = urllib2.urlopen(full_url2).read()
-		     #    json_response2 = json.loads(features)
-		     #    acousticness = float(json_response2["response"]["songs"][0]["audio_summary"]["acousticness"])
-		     #    danceability = float(json_response2["response"]["songs"][0]["audio_summary"]["danceability"])
-		     #    duration = int(json_response2["response"]["songs"][0]["audio_summary"]["duration"])
-		     #    energy = float(json_response2["response"]["songs"][0]["audio_summary"]["energy"])
-		     #    liveness = float(json_response2["response"]["songs"][0]["audio_summary"]["liveness"])
-		     #    loudness = float(json_response2["response"]["songs"][0]["audio_summary"]["loudness"])
-		     #    mode = int(json_response2["response"]["songs"][0]["audio_summary"]["mode"])
-		     #    speechiness = float(json_response2["response"]["songs"][0]["audio_summary"]["speechiness"])
-		     #    tempo = int(json_response2["response"]["songs"][0]["audio_summary"]["tempo"])
-		     #    feature_arr = [song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
-	
-		        # writer.writerow(feature_arr)
+        url = "http://developer.echonest.com/api/v4/song/search"
+        data = {}
+        data['api_key'] = api_key
+        artist = ("%32.32s" % (track['artists'][0]['name'])).strip()
+        artist = unicodedata.normalize('NFKD', artist).encode('ascii','ignore')
+        data['artist'] = artist
+        name = track['name']
+        data['title'] = name
+        url_values = urllib.urlencode(data)
+        full_url = url + '?' + url_values
+        print full_url
+        print
+      	if artist and name:
+	        ids = urllib2.urlopen(full_url).read()
+	        json_response = json.loads(ids)
+	        if len(json_response["response"]["songs"]) > 0:
+	        	song_id = json_response["response"]["songs"][0]["id"]
+		        url2 = "http://developer.echonest.com/api/v4/song/profile"
+		        data2 = {}
+		        data2['api_key'] = api_key
+		        data2['id'] = song_id
+		        data2['bucket'] = 'audio_summary'
+		        url_values2 = urllib.urlencode(data2)
+		        full_url2 = url2 + '?' + url_values2
+		        features = urllib2.urlopen(full_url2).read()
+		        json_response2 = json.loads(features)
+		        acousticness = float(json_response2["response"]["songs"][0]["audio_summary"]["acousticness"])
+		        danceability = float(json_response2["response"]["songs"][0]["audio_summary"]["danceability"])
+		        duration = int(json_response2["response"]["songs"][0]["audio_summary"]["duration"])
+		        energy = float(json_response2["response"]["songs"][0]["audio_summary"]["energy"])
+		        liveness = float(json_response2["response"]["songs"][0]["audio_summary"]["liveness"])
+		        loudness = float(json_response2["response"]["songs"][0]["audio_summary"]["loudness"])
+		        mode = int(json_response2["response"]["songs"][0]["audio_summary"]["mode"])
+		        speechiness = float(json_response2["response"]["songs"][0]["audio_summary"]["speechiness"])
+		        tempo = int(json_response2["response"]["songs"][0]["audio_summary"]["tempo"])
+		        feature_arr = [song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
+		        print feature_arr
+		        writer.writerow(feature_arr)
 
 def spotify_info(username, token):
 	#token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URL)
@@ -175,30 +178,30 @@ def find_songs(acoustic, danceability, duration, energy, liveness, loudness, mod
         'max_acousticness': acoustic + 0.05 if acoustic + 0.05 < 1 else 0.999,
         'min_danceability': danceability - 0.05 if danceability - 0.05 > 0 else 0.001,
         'max_danceability': danceability + 0.05 if danceability + 0.05 < 1 else 0.999,
-        'min_duration': duration - 30 if duration - 30 > 0 else 0.001,
-        'max_duration': duration + 30 if duration + 30 < 3600 else 3599.999,
+        'min_duration': duration - 80 if duration - 80 > 0 else 0.001,
+        'max_duration': duration + 80 if duration + 80 < 3600 else 3599.999,
         'min_energy': energy - 0.05 if energy - 0.05 > 0 else 0.001, 
         'max_energy': energy + 0.05 if energy + 0.05 < 1 else 0.999,
         'min_liveness': liveness - 0.05 if liveness - 0.05 > 0 else 0.001,
         'max_liveness': liveness + 0.05 if liveness + 0.05 < 1 else 0.999,
-        'min_loudness': loudness - 5.5 if loudness - 5.5 > -100 else -99.999,
-        'max_loudness': loudness + 5.5 if loudness + 5.5 < 100 else 99.999,
-        'mode': mode,
+        'min_loudness': loudness - 7.5 if loudness - 7.5 > -100 else -99.999,
+        'max_loudness': loudness + 7.5 if loudness + 7.5 < 100 else 99.999,
+        'mode': int(mode),
         'min_speechiness': speechiness - 0.05 if speechiness - 0.05 > 0 else 0.001,
         'max_speechiness': speechiness + 0.05 if speechiness + 0.05 < 1 else 0.999,
-        'min_tempo': tempo - 10.5 if tempo - 10.5 > 0 else 0.001,
-        'max_tempo': tempo + 10.5 if tempo + 10.5 < 500 else 499.999,
+        'min_tempo': tempo - 15.5 if tempo - 15.5 > 0 else 0.001,
+        'max_tempo': tempo + 15.5 if tempo + 15.5 < 500 else 499.999,
         'sort': 'song_hotttnesss-desc',
-        'results': 25
+        'results': 50
     }
     data = urllib.urlencode(values)
     url = echonest_songs_api + data
-
+    print url
     try: 
         response = urllib2.urlopen(url)
         song_ids = []
         songs = json.loads(response.read())["response"]["songs"]
-        
+        print songs
         for s in songs:
             song_ids.append(str(s["id"]))
         return song_ids
@@ -297,6 +300,7 @@ def get_features(cluster):
 	songs = find_songs(float(features[0]), float(features[1]), float(features[2]), 
 						float(features[3]), float(features[4]), float(features[5]), 
 						float(features[6]), float(features[7]), float(features[8]))
+	print songs
 	return songs
 
 @app.route('/playlists', methods=['POST'])
@@ -332,12 +336,14 @@ def playlist():
 	# num_colors = request.form["num_colors"]
 
 	create_url = "https://api.spotify.com/v1/users/" + username + "/playlists"
-	playlist_name = "Playlist " + number
+	print username
+	playlist_name = "Playlist " + str(number)
 	values = {'name' : playlist_name}
 	auth = "Bearer " + token
 	headers = {'Content-Type': 'application/json', 'Authorization' : auth}
 	r = requests.post(create_url, data=json.dumps(values), headers=headers)
 	json_response = json.loads(r.text)
+	print json_response
 	playlist_id = json_response["id"]
 
 	add_playlist = "https://api.spotify.com/v1/users/" + username + "/playlists/" + playlist_id + "/tracks"
@@ -351,7 +357,8 @@ def playlist():
 def cluster():
 	username = request.args['username']
 	token = request.args['token']
-	songid_file = open("static/songids.csv", "rU")
+	songid_file = open("static/songidsbad.csv", "rU")
+	#songid_file = open("static/songids.csv", "rU")
 	reader = csv.reader(songid_file)
 	features = []
 	other = []
@@ -385,7 +392,7 @@ def cluster():
 	costs = []
 	ratios = []
 	ratio_differences = []
-	for i in range(3, 11):
+	for i in range(3, 9):
 		kmeans_data = k_means(pcaed, n_clusters=i)
 		cost = kmeans_data[2]
 		costs.append(cost)
@@ -473,6 +480,8 @@ def cluster():
 					5 : "#800080", #purple
 					6 : "#625D5D", #grey
 	}
+
+	print clusters
 	for i in range(0, len(clusters)):
 		colors.append(options[clusters[i]])
 	#print colors

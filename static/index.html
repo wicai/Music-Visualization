@@ -12,13 +12,13 @@
     <title>Stylish Portfolio - Start Bootstrap Theme</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="../static/css/stylish-portfolio.css" rel="stylesheet">
+    <link href="css/stylish-portfolio.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="../static/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
   <script src="//code.jquery.com/jquery-1.10.2.js"></script>
@@ -30,13 +30,21 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
+<script>
+  $(function() {
+    $( "input[type=submit], a, button" )
+      .button()
+      .click(function( event ) {
+        event.preventDefault();
+      });
+  });
+  </script>
 </head>
 
 <body>
 
     <!-- Navigation -->
-<!--     <a id="menu-toggle" href="#" class="btn btn-dark btn-lg toggle"><i class="fa fa-bars"></i></a>
+    <a id="menu-toggle" href="#" class="btn btn-dark btn-lg toggle"><i class="fa fa-bars"></i></a>
     <nav id="sidebar-wrapper">
         <ul class="sidebar-nav">
             <a id="menu-close" href="#" class="btn btn-light btn-lg pull-right toggle"><i class="fa fa-times"></i></a>
@@ -50,19 +58,19 @@
                 <a href="cluster.html">Clustering</a>
             </li>
         </ul>
-    </nav> -->
+    </nav>
 
     <!-- Header -->
     <header id="top" class="header">
         <div class="text-vertical-center">
             <h1>Music Clustering</h1>
-            <h4>Your Music - From a new perspective</h4>
+            <h3>Vizualize the Sound you Hear</h3>
             <br>
             <form align="center" action="/submit" method="post">
-        		Username  &nbsp;&nbsp;&nbsp;<input type="text" name="username"><br>
-        		Auth Token <input type="text" name="token"><br>
-        		<input type="submit" value="Submit">
-    		</form>
+        Username  &nbsp;&nbsp;&nbsp;<input type="text" name="username"><br>
+        Auth Token <input type="text" name="token"><br>
+        <input type="submit" value="Submit">
+    </form>
         </div>
     </header>
 
