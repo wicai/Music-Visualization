@@ -126,6 +126,7 @@ def create_playlist(taste_profile_id):
 
 
 songs = find_songs(0.9101, 0.1515, 401.30667, 0.2253, 0.07785, -15.4083, 1, 0.0354, 83.3769)
+print songs
 taste_profile_id = create_taste_profile(songs)
 #create_playlist(taste_profile_id)
 # find_data()

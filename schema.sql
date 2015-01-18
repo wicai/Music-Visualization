@@ -11,7 +11,5 @@ create table features (
 	"loudness" real not null,
 	"mode" integer not null,
 	"speechiness" real not null,
-	"tempo" integer not null,
-	"time_signature" integer not null
-	"valence" real not null
+	"tempo" integer not null
 );
