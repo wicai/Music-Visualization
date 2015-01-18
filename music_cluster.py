@@ -33,11 +33,10 @@ SPOTIPY_CLIENT_SECRET='0153de287f2c45e0846c0390b67f991d'
 SPOTIPY_REDIRECT_URL = 'http://localhost:5000/authorize/'
 
 scope = 'user-library-read'
-username = 'dchen7'
 api_key = 'PV1DZKHWQ6OZX6LEO'
 api_key2 = '4BHBA6BB9J7GOEAJU'
 api_key3 = '4L4M7QV9W0QSNZ2UD'
-token = 'BQA67ckcWuqimPjYC6QZoEa2JO48EBOtsqnWRzFVPR9Skhjx4y2vu8EMV_0HgDXV56VzIZuS5CVaBPS7YixjsfBUKLv3-KfFMSqA0hvKb9rf_CNbVGn7P_fR9wNQ6mZaZmwbuSvCFA1CtKKwN6M_yph4OJEqWw'
+
 def connect_db():
 	return sqlite3.connect(app.config['DATABASE'])
 
@@ -57,62 +56,51 @@ def show_tracks(tracks):
         track = item['track']
         print "   %d %32.32s %s" % (i, track['artists'][0]['name'],
             track['name'])
-        url = "http://developer.echonest.com/api/v4/song/search"
-        data = {}
-        data['api_key'] = api_key
-        artist = (("%32.32s" % (track['artists'][0]['name'])).encode("utf8")).strip()
-        data['artist'] = artist
-        name = track['name']
-        data['title'] = name
-        url_values = urllib.urlencode(data)
-        full_url = url + '?' + url_values
-        print full_url
-        print
-      	if artist and name:
-	        ids = urllib2.urlopen(full_url).read()
-	        json_response = json.loads(ids)
-	        if len(json_response["response"]["songs"]) > 0:
-	        	song_id = json_response["response"]["songs"][0]["id"]
-		        url2 = "http://developer.echonest.com/api/v4/song/profile"
-		        data2 = {}
-		        data2['api_key'] = api_key
-		        data2['id'] = song_id
-		        data2['bucket'] = 'audio_summary'
-		        url_values2 = urllib.urlencode(data2)
-		        full_url2 = url2 + '?' + url_values2
-		        features = urllib2.urlopen(full_url2).read()
-		        json_response2 = json.loads(features)
-		        acousticness = float(json_response2["response"]["songs"][0]["audio_summary"]["acousticness"])
-		        danceability = float(json_response2["response"]["songs"][0]["audio_summary"]["danceability"])
-		        duration = int(json_response2["response"]["songs"][0]["audio_summary"]["duration"])
-		        energy = float(json_response2["response"]["songs"][0]["audio_summary"]["energy"])
-		        liveness = float(json_response2["response"]["songs"][0]["audio_summary"]["liveness"])
-		        loudness = float(json_response2["response"]["songs"][0]["audio_summary"]["loudness"])
-		        mode = int(json_response2["response"]["songs"][0]["audio_summary"]["mode"])
-		        speechiness = float(json_response2["response"]["songs"][0]["audio_summary"]["speechiness"])
-		        tempo = int(json_response2["response"]["songs"][0]["audio_summary"]["tempo"])
-		        feature_arr = [song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
-		  #       for i in range(0, len(feature_arr)):
-		  #       	print type(feature_arr[i])
-		  #       features = ','.join(feature_arr)
-		  #       query = 'INSERT INTO %s (%s) VALUES (%s)' % (
-				# 	"features",
-				# 	fields,
-				# 	features
-				# )
-		  #       print query
-		  #       cur.execute(query)
-		  #       db.commit()
+       #  url = "http://developer.echonest.com/api/v4/song/search"
+       #  data = {}
+       #  data['api_key'] = api_key
+       #  artist = (("%32.32s" % (track['artists'][0]['name'])).encode("utf8")).strip()
+       #  data['artist'] = artist
+       #  name = track['name']
+       #  data['title'] = name
+       #  url_values = urllib.urlencode(data)
+       #  full_url = url + '?' + url_values
+       #  print full_url
+       #  print
+      	# if artist and name:
+	      #   ids = urllib2.urlopen(full_url).read()
+	      #   json_response = json.loads(ids)
+	      #   if len(json_response["response"]["songs"]) > 0:
+	      #   	song_id = json_response["response"]["songs"][0]["id"]
+		     #    url2 = "http://developer.echonest.com/api/v4/song/profile"
+		     #    data2 = {}
+		     #    data2['api_key'] = api_key
+		     #    data2['id'] = song_id
+		     #    data2['bucket'] = 'audio_summary'
+		     #    url_values2 = urllib.urlencode(data2)
+		     #    full_url2 = url2 + '?' + url_values2
+		     #    features = urllib2.urlopen(full_url2).read()
+		     #    json_response2 = json.loads(features)
+		     #    acousticness = float(json_response2["response"]["songs"][0]["audio_summary"]["acousticness"])
+		     #    danceability = float(json_response2["response"]["songs"][0]["audio_summary"]["danceability"])
+		     #    duration = int(json_response2["response"]["songs"][0]["audio_summary"]["duration"])
+		     #    energy = float(json_response2["response"]["songs"][0]["audio_summary"]["energy"])
+		     #    liveness = float(json_response2["response"]["songs"][0]["audio_summary"]["liveness"])
+		     #    loudness = float(json_response2["response"]["songs"][0]["audio_summary"]["loudness"])
+		     #    mode = int(json_response2["response"]["songs"][0]["audio_summary"]["mode"])
+		     #    speechiness = float(json_response2["response"]["songs"][0]["audio_summary"]["speechiness"])
+		     #    tempo = int(json_response2["response"]["songs"][0]["audio_summary"]["tempo"])
+		     #    feature_arr = [song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
 	
 		        # writer.writerow(feature_arr)
-	#cur.close()
 
-def spotify_info():
+def spotify_info(username, token):
 	#token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URL)
 	if token:
 	    sp = spotipy.Spotify(auth=token)
 	    playlists = sp.user_playlists(username)
         for playlist in playlists['items']:
+            print playlist['owner']['id']
             if playlist['owner']['id'] == username:
                 print playlist['name']
                 print '  total tracks', playlist['tracks']['total']
@@ -123,7 +111,6 @@ def spotify_info():
                 while tracks['next']:
                     tracks = sp.next(tracks)
                     show_tracks(tracks)
-                break
 	else:
 	    print "Can't get token for", username
 
@@ -143,30 +130,32 @@ def submit():
 	# 	url_values = urllib.urlencode(data)
 	# 	full_url = url + '?' + url_values
 	# 	response = urllib2.urlopen(full_url)
-		spotify_info()
+		username = request.form['username']
+		token = request.form['token']
+		spotify_info(username, token)
 		# print response.read()
 		return redirect(url_for('cluster'))
 
 
-@app.route('/authorize')
-def authorize():
-	code = request.args.get('code')
-	print "CODE: " + code
-	url = 'https://accounts.spotify.com/api/token'
-	values = {'grant_type' : 'authorization_code',
-						'code' : code,
-						'redirect_uri' : SPOTIPY_REDIRECT_URL,
-						'client_id' : SPOTIPY_CLIENT_ID,
-						'client_secret' : SPOTIPY_CLIENT_SECRET
-	}
-	data = urllib.urlencode(values)
-	req = urllib2.Request(url, data)
-	response = urllib2.urlopen(req).read()
-	json_response = json.loads(response)
-	access_token = json_response['access_token']
-	refresh_token = json_response['refresh_token']
-	print access_token
-	return redirect(url_for('cluster'))
+# @app.route('/authorize')
+# def authorize():
+# 	code = request.args.get('code')
+# 	print "CODE: " + code
+# 	url = 'https://accounts.spotify.com/api/token'
+# 	values = {'grant_type' : 'authorization_code',
+# 						'code' : code,
+# 						'redirect_uri' : SPOTIPY_REDIRECT_URL,
+# 						'client_id' : SPOTIPY_CLIENT_ID,
+# 						'client_secret' : SPOTIPY_CLIENT_SECRET
+# 	}
+# 	data = urllib.urlencode(values)
+# 	req = urllib2.Request(url, data)
+# 	response = urllib2.urlopen(req).read()
+# 	json_response = json.loads(response)
+# 	access_token = json_response['access_token']
+# 	refresh_token = json_response['refresh_token']
+# 	print access_token
+# 	return redirect(url_for('cluster'))
 
 @app.route('/cluster')
 def cluster():
