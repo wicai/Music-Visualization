@@ -242,17 +242,16 @@ def cluster():
 
 	clusters = returned[1].tolist()
 	colors = []
-	options = {0 : "#000",
-					1 : "#FF0000",
-					2 : "#0000FF",
-					3 : "#008000",
-					4 : "#FFA500",
-					5 : "#800080",
-					6 : "#FFFF00",
-					7 : "#625D5D",
-					8 : "#00FFFF",
-					9 : "#FFE5B4",
-					10 : "#FC6C85",
+	options = {0 : "#000",  #black
+					1 : "#FF0000", #red
+					2 : "#0000FF", #blue
+					3 : "#008000", #green
+					4 : "#FFA500", #orange
+					5 : "#800080", #purple
+					6 : "#625D5D", #grey
+					7 : "#00FFFF", #blue
+					8 : "#FFE5B4", #light orange
+					9 : "#FC6C85",#pink
 	}
 	for i in range(0, len(clusters)):
 		colors.append(options[clusters[i]])
@@ -261,8 +260,10 @@ def cluster():
 	xmax.append(max(x1))
 	xmax.append(max(x2))
 	xmax.append(max(x3))
+	
+	num_colors=max(clusters) + 1
 
-	return render_template('cluster.html', colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists), xmax=json.dumps(xmax))
+	return render_template('cluster.html', colors=json.dumps(colors), x1=json.dumps(x1), x2=json.dumps(x2), x3=json.dumps(x3), names=json.dumps(names), artists=json.dumps(artists), xmax=json.dumps(xmax), num_colors=json.dumps(num_colors))
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')
