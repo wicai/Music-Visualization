@@ -1,0 +1,14 @@
+../spotipy/__init__.py
+../spotipy/client.py
+../spotipy/oauth2.py
+../spotipy/util.py
+../spotipy/__init__.pyc
+../spotipy/client.pyc
+../spotipy/oauth2.pyc
+../spotipy/util.pyc
+./
+dependency_links.txt
+PKG-INFO
+requires.txt
+SOURCES.txt
+top_level.txt
