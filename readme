@@ -6,26 +6,30 @@ Clusterfy extracts songs from a user’s Spotify playlists and applies k-means c
 How to Use:
 
 1) Start Clusterfy
-	- Run the command "python music_clustering.py"
-	- Go to "http://localhost:5000/" in your web browser
+	
+- Run the command "python music_clustering.py"
+- Go to "http://localhost:5000/" in your web browser
 
 
 2) Request an OAuth Token from https://developer.spotify.com/web-api/console/post-playlists/
-	- Fill in your Spotify username and press "Get OAuth Token"
-	- Check "playlist-modify-public" and "playlist-modify-private" and press "Request Token"
+	
+- Fill in your Spotify username and press "Get OAuth Token"
+- Check "playlist-modify-public" and "playlist-modify-private" and press "Request Token"
 
-	*Note: OAuth tokens expire after a certain period of time and you will have to request a new one*
+*Note: OAuth tokens expire after a certain period of time and you will have to request a new one*
 
 
 3) Enter User Information into Clusterfy
-	- Enter your Spotify username into the text field "Username"
-	- Copy and Paste the OAuth token from the previous step into the text field "Auth Token"
-	- Wait for Clusterfy to finish processing your songs
+	
+- Enter your Spotify username into the text field "Username"
+- Copy and Paste the OAuth token from the previous step into the text field "Auth Token"
+- Wait for Clusterfy to finish processing your songs
 
 
 4) Add Playlists
-	- Check out our cool data visualization of your songs!
-	- If you want to add a playlist built around one of the clusters, click on the corresponding button on the right side of the plot
+	
+- Check out our cool data visualization of your songs!
+- If you want to add a playlist built around one of the clusters, click on the corresponding button on the right side of the plot
 
 
 
