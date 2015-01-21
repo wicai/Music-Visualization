@@ -75,6 +75,7 @@ def show_tracks(tracks):
         artist = unicodedata.normalize('NFKD', artist).encode('ascii','ignore')
         data['artist'] = artist
         name = track['name']
+        name = unicodedata.normalize('NFKD', name).encode('ascii','ignore')
         data['title'] = name
         url_values = urllib.urlencode(data)
         full_url = url + '?' + url_values
@@ -318,11 +319,11 @@ def playlist():
 
 	options = {"black" : 0,
 					"red" : 1,
-					"glue" : 2,
+					"blue" : 2,
 					"green" : 3,
 					"orange" : 4,
 					"purple" : 5,
-					"grey" : 6
+					"pink" : 6
 	}
 
 	color = request.form["id"]
@@ -488,7 +489,7 @@ def cluster():
 					3 : "#008000", #green
 					4 : "#FFA500", #orange
 					5 : "#800080", #purple
-					6 : "#625D5D", #grey
+					6 : "#F781F3", #pink
 	}
 
 	print clusters
