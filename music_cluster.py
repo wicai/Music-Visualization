@@ -79,8 +79,8 @@ def show_tracks(tracks):
         data['title'] = name
         url_values = urllib.urlencode(data)
         full_url = url + '?' + url_values
-        print full_url
-        print
+        #print full_url
+        #print
       	if artist and name:
 		try:
 			ids = urllib2.urlopen(full_url).read()
@@ -106,7 +106,7 @@ def show_tracks(tracks):
 				speechiness = float(json_response2["response"]["songs"][0]["audio_summary"]["speechiness"])
 				tempo = int(json_response2["response"]["songs"][0]["audio_summary"]["tempo"])
 				feature_arr = [song_id, name, artist, acousticness, danceability, duration, energy, liveness, loudness, mode, speechiness, tempo]
-				print feature_arr
+				#print feature_arr
 				writer.writerow(feature_arr)
 		except urllib2.HTTPError, err:
 			if err.code == 429:
@@ -347,14 +347,12 @@ def playlist():
 	# num_colors = request.form["num_colors"]
 
 	create_url = "https://api.spotify.com/v1/users/" + username + "/playlists"
-	print username
 	playlist_name = str(color) + " playlist"
 	values = {'name' : playlist_name}
 	auth = "Bearer " + token
 	headers = {'Content-Type': 'application/json', 'Authorization' : auth}
 	r = requests.post(create_url, data=json.dumps(values), headers=headers)
 	json_response = json.loads(r.text)
-	print json_response
 	playlist_id = json_response["id"]
 
 	add_playlist = "https://api.spotify.com/v1/users/" + username + "/playlists/" + playlist_id + "/tracks"
@@ -492,7 +490,7 @@ def cluster():
 					6 : "#F781F3", #pink
 	}
 
-	print clusters
+	#print clusters
 	for i in range(0, len(clusters)):
 		colors.append(options[clusters[i]])
 	#print colors
